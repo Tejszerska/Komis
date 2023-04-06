@@ -21,7 +21,7 @@ public class Client {
     private List<Contract> contracts;
     @ManyToMany(mappedBy = "clients")
     private List<Address> addresses;
-    // wiele ponieważ może być wiele adresów do późniejszej wysyłki
+    // wiele ponieważ może być wiele adresów do np. do wysyłki - funkcjonalność do zaimplementowania w ver2
 
     @Column(nullable = false)
     private String name;

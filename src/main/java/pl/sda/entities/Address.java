@@ -39,4 +39,10 @@ public class Address {
         this.houseNum = houseNum;
         this.flatNum = flatNum;
     }
+
+    public Address(String city, String street, String houseNum) {
+        this.city = city;
+        this.street = street;
+        this.houseNum = houseNum;
+    }
 }

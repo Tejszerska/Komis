@@ -12,10 +12,16 @@ public class EmployeeService {
             employeeDao.save(employee);
             return true;
         }
-
         return false;
     }
 
+    public Employee getByPesel(String pesel) {
+        return employeeDao.getByPesel(pesel);
+    }
+
+    public boolean existsByPesel(String pesel) {
+        return employeeDao.existsByPesel(pesel);
+    }
 }
 
 
