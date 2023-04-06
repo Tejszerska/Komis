@@ -16,12 +16,6 @@ public class EmployeeService {
         return false;
     }
 
-    public boolean editEmployeeByPesel(String name, String surname, String pesel) {
-
-        if(employeeDao.existsByPesel(pesel)){
-            employeeDao.setNameSurname;
-        }
-    }
 }
 
 

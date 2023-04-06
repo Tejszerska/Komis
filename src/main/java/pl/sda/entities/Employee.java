@@ -29,4 +29,15 @@ public class Employee {
         this.surname = surname;
         this.pesel = pesel;
     }
+
+    @Override
+    public String toString() {
+        return "Employee{" +
+                "id=" + id +
+                ", contracts=" + contracts +
+                ", name='" + name + '\'' +
+                ", surname='" + surname + '\'' +
+                ", pesel='" + pesel + '\'' +
+                '}';
+    }
 }

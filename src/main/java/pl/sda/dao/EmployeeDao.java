@@ -21,26 +21,21 @@ public class EmployeeDao extends AbstractDao {
     }
 
     private Employee getByPesel(String pesel) {
-        Connection connection = null;
-        try {
-            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/komis?serverTimezone=Europe/Warsaw", "root", "kijanka321");
+        String hql = "FROM Employee WHERE pesel = :p1";
+        Session session = HibernateUtil.getSession();
+        Query query = session.createQuery(hql);
+        query.setParameter("p1", pesel);
 
-            Statement statement = connection.createStatement();
-            statement.execute("UPDATE employee SET name = " + name);
-            statement.execute("UPDATE employee SET surname = " + surname);
+        List<Employee> resultList = query.getResultList();
+        session.close();
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            if (connection != null) {
-                try {
-                    connection.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+        return resultList
+                .stream()
+                .findFirst()
+                .orElse(null);
         }
-    }
+
     }
 
-}
+
+

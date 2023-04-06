@@ -1,5 +1,7 @@
 package pl.sda.main;
 
+import org.hibernate.query.Query;
+import pl.sda.dao.EmployeeDao;
 import pl.sda.entities.*;
 import org.hibernate.Session;
 import pl.sda.enums.Category;
@@ -13,10 +15,14 @@ import java.util.List;
 import java.util.Scanner;
 
 import static java.lang.System.in;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
 
 public class Main {
     private static Scanner scanner = new Scanner(in);
     private static EmployeeService employeeService = new EmployeeService();
+    private  static EmployeeDao employeeDao = new EmployeeDao();
 
     public static void main(String[] args) {
         Session session = HibernateUtil.getSession();
@@ -70,9 +76,9 @@ public class Main {
                 case 0: HibernateUtil.closeSessionFactory(); System.exit(0);
                 case 11: addEmployee(); break;
                 case 12: editEmployee(); break; //TODO
-//                case 13: deleteEmployee(); break;
+                case 13: deleteEmployeeByPesel(); break;
 //                case 21: addClient(); break;
-////                case 23: deleteClient(); break;
+//                case 23: deleteClient(); break;
 //                case 31: findContractById(); break;
                 default: System.out.println("Nierozpoznana operacja"); break;
             }
@@ -80,27 +86,64 @@ public class Main {
     }
 
     private static void editEmployee() {
-        System.out.println("Podaj  PESEL pracownika, który ma być edytowany");
-        System.out.println("Podaj PESEL: ");
-        String pesel = scanner.next();
 
-        // settery i scanner
+        System.out.println("Podaj PESEL pracownika, który ma być edytowany: ");
+        String newPesel = scanner.next();
+        scanner.nextLine();
+
         System.out.println("Podaj nowe imię: ");
-        String name = scanner.next();
+        String newName = scanner.next();
+        scanner.nextLine();
 
         System.out.println("Podaj nowe nazwisko: ");
-        String surname = scanner.next();
+        String newSurname = scanner.next();
+        scanner.nextLine();
+
+        Session session = HibernateUtil.getSession();
+        System.out.println("Simple update");
+        String qrySetName = "UPDATE Employee e SET e.name = '" + newName + "' "+
+                "WHERE pesel = '" + newPesel + "' ";
+        String qrySetSurname = "UPDATE Employee e SET e.surname = '" + newSurname + "' "+
+                "WHERE pesel = '" + newPesel + "' ";
+        Query query1 = session.createQuery(qrySetName);
+        Query query2 = session.createQuery(qrySetSurname);
+
+        session.getTransaction().begin();
+        query1.executeUpdate();
+        query2.executeUpdate();
+        session.getTransaction().commit();
+        session.close();
 
 
-        boolean result = employeeService.editEmployeeByPesel (name, surname, pesel);
+
+//        Query query1 = session.createQuery("FROM Employee WHERE pesel = '" + newPesel + "' ");
+//        Query query2 = session.createQuery("UPDATE Employee e SET e.name = '" + newName + "' "+
+//                "WHERE pesel = '" + newPesel + "' ");
+//
+//        query2.executeUpdate();
 
 
-        if (result) {
-            System.out.println("Pomyślnie edytowano pracownika " + name + " " + surname);
-        } else {
-            System.out.println("Nie znaleziono pracownika o numerze PESEL: " + pesel);
-        }
+
+        System.out.println("Nie zaktualizowano bazy ;/ na później");
+        session.close();
+
     }
+
+    private static void deleteEmployeeByPesel() {
+
+        System.out.println("Podaj PESEL usuwanego pracownika");
+        String pesel = scanner.next();
+
+        Session session = HibernateUtil.getSession();
+        Query delete = session.createQuery("DELETE FROM Employee p where p.pesel=:pesel")
+                .setParameter("pesel", pesel);
+        session.getTransaction().begin();
+        delete.executeUpdate();
+        session.getTransaction().commit();
+        session.close();
+        System.out.println("Pomyślnie usunięto pracownika o PESEL: " + pesel);
+    }
+
 
     private static void addEmployee() {
         System.out.println("Podaj imię: ");
