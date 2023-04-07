@@ -18,18 +18,12 @@ public class ClientService {
     public void save(Client patient) {
         clientDao.save(patient);
     } // met. skopiowana z MedicalApp, służy do testów?
-    public boolean createClientWithAddress(String name, String surname, String pesel, String city, String street, String houseNum, String flatNum, String phone, String email, String commments) {
+    public boolean createClientWithAddress(String name, String surname, String pesel, String city, String street, String houseNum, String flatNum, String postcode, String phone, String email, String commments) {
         if (!clientDao.existsByPesel(pesel)) {
-            Address address = new Address(city, street, houseNum);
+            Address address = new Address(city, street, houseNum, postcode);
             if(!flatNum.isBlank()){
                 address.setFlatNum(flatNum);
             }
-            System.out.println("Lista sugerowanych kodów pocztowych: ");
-            System.out.println(addressService.checkPostcode(city));
-
-            System.out.println("Wpisz wybrany kod pocztowy w formacie XX-XXX");
-            String postcode = scanner.next();
-            address.setPostcode(postcode);
 
             List<Address> clientsAddresses = new ArrayList<>();
             clientsAddresses.add(address);
@@ -41,5 +35,9 @@ public class ClientService {
             return true;
         }
         return false;
+    }
+
+    public boolean existsByPesel(String pesel) {
+        return clientDao.existsByPesel(pesel);
     }
 }
