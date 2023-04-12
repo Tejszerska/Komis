@@ -17,7 +17,8 @@ public class Address {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @JoinTable(joinColumns = @JoinColumn(name = "addressId", referencedColumnName = "id"),
+    @JoinTable(name = "ClientAddress",
+            joinColumns = @JoinColumn(name = "addressId", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "clientId", referencedColumnName = "id")
     )
     @ManyToMany

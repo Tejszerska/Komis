@@ -11,6 +11,7 @@ import pl.sda.util.HibernateUtil;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
@@ -28,21 +29,27 @@ public class Main {
         // ********************************DEVELOPMENT TESTS
         Session session = HibernateUtil.getSession();
         Employee employee1 = new Employee("Joanna", "Mickiewicz", "96121536981");
-        Client client1 = new Client("Adam", "Spadam", "59874532145");
+        Client client2 = new Client("Adam", "Spadam", "22222222222");
+        Client client1 = new Client("Karolina", "Marianka", "11111111111");
 
         Address address1 = new Address("Gołdap", "Sosnowa", "3", "4");
-        List<Address> addressList = new ArrayList<>();
-        addressList.add(address1);
-        client1.setAddresses(addressList);
+        Address address2 = new Address("Ełk", "Placowa", "13", "---");
+        Address address3 = new Address("Warszawa", "Długa", "1565", "12");
+
+        client1.setAddresses(Arrays.asList(address1, address2));
+        client2.setAddresses(Arrays.asList(address2, address3));
 
 
-        List<Good> goods = new ArrayList<>();
-        Contract contract1 = new Contract(employee1, client1, goods);
-        Good good = new Good("applewatch", Category.OTHER_ELECTRONICS, BigDecimal.valueOf(1500), BigDecimal.valueOf(3000), contract1);
-        goods.add(good);
+        Good good = new Good("applewatch", Category.OTHER_ELECTRONICS, BigDecimal.valueOf(1500), BigDecimal.valueOf(3000), null);
+
+        Contract contract1 = new Contract(employee1, client1, Arrays.asList(good));
+
         session.getTransaction().begin();
         session.persist(client1);
+        session.persist(client2);
         session.persist(address1);
+        session.persist(address2);
+        session.persist(address3);
         session.persist(contract1);
         session.persist(employee1);
         session.persist(good);
@@ -64,7 +71,7 @@ public class Main {
 //            System.out.println("13 - Usuń pracownika");
             System.out.println("DOT. KLIENTA");
             System.out.println("21 - Dodaj klienta"); //TODO ver1: sprawdzić czemu nie wyświetla adresów przypisanych do klienta w tabeli address_client
-            System.out.println("22 - Zmień dane klienta");
+            System.out.println("22 - Zmień dane klienta"); //TODO ver1: rozkminić zmianę adresu, ale po poprawieniu tabeli łączącej i nie wyświetlania / dodawani rekordów do niej
             System.out.println("23 - Usuń klienta");
 //            System.out.println("DOT. UMOWY");
 //            System.out.println("21 - Dodaj umowę");
@@ -96,13 +103,30 @@ public class Main {
                 case 22:
                     editClient();
                     break; //TODO ver1 : Będzie potrzebny refactor. Nieeleganckie są HQLy w tej ilości.
-//                case 23: deleteClient(); break;
+                case 23: deleteClientByPesel(); break;
 //                case 31: findContractById(); break;
                 default:
                     System.out.println("Nierozpoznana operacja");
                     break;
             }
         } while (true);
+    }
+
+    private static void deleteClientByPesel() {
+        out.println("Podaj PESEL usuwanego klienta");
+        String pesel = scanner.next();
+        if(clientService.existsByPesel(pesel)){
+            Session session = HibernateUtil.getSession();
+            Query delete = session.createQuery("DELETE FROM Client c WHERE c.pesel=:pesel")
+                    .setParameter("pesel", pesel);
+            session.getTransaction().begin();
+            delete.executeUpdate();
+            session.getTransaction().commit();
+            session.close();
+            out.println("Pomyślnie usunięto klienta o numerze PESEL: " + pesel);
+        } else {
+            out.println("Nie odnaleziono klienta o podanym numerze PESEL: " + pesel);
+        }
     }
 
     private static void editClient() {
